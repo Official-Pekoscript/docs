@@ -94,7 +94,16 @@
                             <a href="#stdpair">Pairs</a>
                         </li>
                         <li>
+                            <a href="#stdit">Iterator</a>
+                        </li>
+                        <li>
                             <a href="#stdio">IO</a>
+                        </li>
+                        <li>
+                            <a href="#stdfs">FS</a>
+                        </li>
+                        <li>
+                            <a href="#stdother">Other methods</a>
                         </li>
                     </ul>
                 </li>
@@ -125,9 +134,6 @@
                             <a href="#uipage">Creating a page</a>
                         </li>
                         <li>
-                            <a href="#uicallback">Adding Callbacks</a>
-                        </li>
-                        <li>
                             <a href="#uiapp">Creating the App</a>
                         </li>
                     </ul>
@@ -145,14 +151,10 @@
         <div id="content">
             <h2>Quick Start</h2>
             <p id="qsDownload">Start by downloading the <a class="fancy-link" href="#">installer</a></p>
-            <div class="note">
-                <i class="fa-solid fa-lightbulb"></i>
-                <span>Pekoscript doesn't have an installer, must be built from source.</span>
-            </div>
 
             <p id="helloWorld">Create a file named <i>main.peko</i> and add the contents</p>
             <pre class="prettyprint">
-func main() {
+func onstart() {
     std::io::print("Hello world");
 }
 </pre>
@@ -174,18 +176,9 @@ func main() {
                             <li>num -> For integer and float literals</li>
                             <li>size -> For unsigned integer literals (integers that can't be less than 0)</li>
                             <li>bool -> For boolean values</li>
-                            <li>void -> Emtpy type</li>
-                        </ul>
-                        <div class="note">
-                            <i class="fa-solid fa-lightbulb"></i>
-                            <span>The following section is not needed to use pekoscript generally.</span>
-                        </div>
-                        <br>
-                        <p>Built-In types for C ffi:</p>
-                        <ul>
-                            <li>cint -> Equivalent to a normal 32-bit integer</li>
-                            <li>cvoid -> Void pointer type</li>
+                            <li>opaque -> Empty pointer type</li>
                             <li>size -> Equivalent to a long in C</li>
+                            <li>void -> Emtpy type</li>
                         </ul>
                         <p>Pekoscript also has <i>true</i> and <i>false</i> keywords for boolean values</p>
                         <br>
@@ -237,11 +230,17 @@ func main() {
 } else {
     ...
 }</pre>
-                        <p>For looping, Pekoscript currently only supports while loops. They will loop until the
+                        <p>Pekoscript supports while loops. They will loop until the
                             provided condition is false</p>
                         <pre class="prettyprint">while condition {
     ...
 }</pre>
+
+                        <p>Pekoscript also supports for loops. For loops use the <i>in</i> keyword to loop through an iterator</p>
+                        <pre class="prettyprint">for thing in things {
+    ...
+}</pre>
+
                         <p>To break out of a loop before the condition is false, use the <i>break</i> keyword</p>
                         <pre class="prettyprint">while condition {
     ...
@@ -355,8 +354,8 @@ class Worker : Person {
                         </ul>
                         <br>
                         <h4 id="generics">Generics</h4>
-                        <p>Pekoscript has support for generics. Generics can be defined as classes, although two
-                            differences is that they take type parameters and cannot inherit.</p>
+                        <p>Pekoscript has support for generics. Generics can be defined as classes, with the only difference being
+                            that they take type parameters.</p>
                         <p>To create a generic, the syntax is almost the same as a class declaration:</p>
                         <pre class="prettyprint">class class_name&lt;typeparam1, typeparam2, ...&gt; {
     data1: typeparam1;
@@ -367,7 +366,11 @@ class Worker : Person {
     }
 }</pre>
                         <p>To create an instane of a generic class, it is very similiar to class instance creations:</p>
-                        <pre class="prettyprint">let instance = class_name: &lt;type&gt;(constructor_args)</pre>
+                        <pre class="prettyprint">let instance: class_name&lt;type&gt; = class_name: &lt;type&gt;(constructor_args)</pre>
+                        <div class="note">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <span>When referring to a generic type, the semicolon is not needed. When creating a generic instance, you must use a semicolon</span>
+                        </div>
                         <br>
                         <h4 id="modules">Modules</h4>
                         <p>There are two ways to create modules in pekoscript: 1) By defining it with special syntax, or
@@ -404,10 +407,12 @@ class Worker : Person {
                         <h4 id="platExps">Platform Expressions</h4>
                         <p>Platform expression are simply expressions that only get evaluated if the provided platform
                             name is equal to the current compilation target.</p>
-                        <pre class="prettyprint">platform "platformname" {
+                        <pre class="prettyprint">platform "platformname"|"platformname2" {
     ...
 }</pre>
                         <p>The platform name can either be "osx", "win32", or "linux"</p>
+                        <p>Platform expressions can also be writen with the <i>arch</i> keyword in order to evaluate the code in the expression if the arch is the current compilation architecture.</p>
+                        <p>The arch can be "x86_64", "arm", or "i686"</p>
                         <p>Anything can be defined in the platform expressions body</p>
                         <div class="line"></div>
                         <h2>Standard Library</h2>
@@ -428,6 +433,8 @@ class Worker : Person {
                         <p>The array class is a generic that can store a collection of the provided type</p>
                         <p>To instantiate an Array, </p>
                         <pre class="prettyprint">std::Array: &lt;type&gt;()</pre>
+                        <p>Or</p>
+                        <pre class="prettyprint">[val1, val2]</pre>
                         <p>The array class also uses overloads so that you can access and set like an array:</p>
                         <pre class="prettyprint">let array = std::Array: &lt;str&gt;()
 array.push("hello world")
@@ -447,6 +454,8 @@ std::io::print(array[0]);
                         <p>The map class is a generic that can be indexed by a given type to a piece of data</p>
                         <p>To instantiate a Map, </p>
                         <pre class="prettyprint">std::Map: &lt;type1, type2&gt;()</pre>
+                        <p>Or</p>
+                        <pre class="prettyprint">{key1: val1}</pre>
                         <p>The Map class also uses overloads so that you can access and set like an array:</p>
                         <pre class="prettyprint">let map = std::Map: &lt;str, num&gt;()
 map.insert("item1", 10);
@@ -457,6 +466,7 @@ std::io::println(map["item1"]);
                         <ul>
                             <li><pre class="prettyprint">std::Map.insert(KT, VT)</pre> ↳ inserts the provided value at the index</li>
                             <li><pre class="prettyprint">std::Map.contains(KT): bool</pre> ↳ returns true if the key is in the map, returns false otherwise</li>
+                            <li><pre class="prettyprint">std::Map.remove(KT)</pre> ↳ removes the key from the map</li>
                         </ul>
                         <h4 id="stdpair">Pair class</h4>
                         <p>The Pair class is a generic that holds two pieces of data of the provided types</p>
@@ -467,13 +477,46 @@ std::io::println(map["item1"]);
 std::io::println(dude.first); // prints dude
 std::io::println(dude.second); // prints 14
 </pre>
+
+                        <h4 id="stdit">Iterator class</h4>
+                        <p>The iterator class is a generic that can be inherited to create custom iterators for a <i>for</i> loop</p>
+                        <p>To inherit an Iterator, </p>
+                        <pre class="prettyprint">class class_name: std::Iterator&lt;type&gt;</pre>
+                        <p>Or</p>
+                        <pre class="prettyprint">class class_name&lt;T&gt;: std::Iterator&lt;T&gt;</pre>
+                        <p>The class offers the following methods:</p>
+                        <ul>
+                            <li><pre class="prettyprint">std::Iterator.next(): IT</pre> ↳ should return the current element and then increment the index</li>
+                            <li><pre class="prettyprint">std::Iterator.back(): IT</pre> ↳ should return the current element and then decrement the index</li>
+                            <li><pre class="prettyprint">std::Iterator.increment(inc: size): IT</pre> ↳ should return the current element and then increment the index by inc</li>
+                            <li><pre class="prettyprint">std::Iterator.current(): IT</pre> ↳ should return the current element</li>
+                            <li><pre class="prettyprint">std::Iterator.inrange(): bool</pre> ↳ should return true if the iterator is still in-range, otherwise return false</li>
+                        </ul>
+
                         <h4 id="stdio">IO module</h4>
                         <p>The IO module provides 4 methods for handling input and output</p>
                         <ul>
-                            <li><pre class="prettyprint">std::io::fmt(std::String, std::Array&lt;std::String&gt;): str</std::String></pre> ↳ formats {} with the provided string</li>
+                            <li><pre class="prettyprint">std::io::fmt(std::String, ...): str</std::String></pre> ↳ formats {} with the provided strings, excepts unlimited arguments</li>
                             <li><pre class="prettyprint">std::io::print(str)</pre> ↳ prints the provided string without a newline</li>
                             <li><pre class="prettyprint">std::io::println(str)</pre> ↳ prints the provided string with a newline</li>
-                            <li><pre class="prettyprint">std::io::input(str): std::String</pre> ↳ prints the provided string and returns the input from the terminal as a str</li>
+                            <li><pre class="prettyprint">std::io::inp(str): std::String</pre> ↳ prints the provided string and returns the input from the terminal as a str</li>
+                        </ul>
+                        <h4 id="stdfs">FS module</h4>
+                        <p>The FS module provides 4 methods for handling reading and writing files</p>
+                        <ul>
+                            <li><pre class="prettyprint">std::fs::File(file_name: std::String): str</std::String></pre> ↳ creates a new file object for a file with name</li>
+                            <li><pre class="prettyprint">std::fs::File.write(data: str)</std::String></pre> ↳ writes data to file object</li>
+                            <li><pre class="prettyprint">std::fs::File.read(): str</std::String></pre> ↳ reads data from file object</li>
+                            <li><pre class="prettyprint">std::fs::File.append(data: str): str</std::String></pre> ↳ appends data to end of file object</li>
+                        </ul>
+                        <h4 id="stdother">Other methods</h4>
+                        <p>The standard library also offers 5 other methods for handling various tasks</p>
+                        <ul>
+                            <li><pre class="prettyprint">std::to_string(inp: ANY): str</std::String></pre> ↳ uses pekoscript autoboxing to convert any value into a string</li>
+                            <li><pre class="prettyprint">std::stod(str): num</std::String></pre> ↳ converts a string to a num(double)</li>
+                            <li><pre class="prettyprint">std::stoi(str): size</std::String></pre> ↳ converts a string to a size(int)</li>
+                            <li><pre class="prettyprint">std::ctos(str): str</std::String></pre> ↳ converts a char to a str</li>
+                            <li><pre class="prettyprint">std::ctoi(str): size</std::String></pre> ↳ converts a char to a size(int)</li>
                         </ul>
                         <div class="line"></div>
                         <h2>CLI</h2>
@@ -492,7 +535,7 @@ std::io::println(dude.second); // prints 14
                         </ul>
                         <br>
                         <h6 id="clicross">Cross Compiling</h6>
-                        <p>Pekoscript is versatile and currently supports compiling to Windows (x86_64 and arm), MacOS (both Intel and M-Chip series), and Linux (both x86_64 and arm). provides a few options for compiling.</p>
+                        <p>Pekoscript is versatile and currently supports compiling to Windows, MacOS (both Intel and M-Chip series), and Linux (both x86_64 and arm). provides a few options for compiling.</p>
                         <p>To set your target os for:</p>
                         <ul>
                             <li>Windows: pass win32 to the -os flag</li>
@@ -532,7 +575,7 @@ import print as object
 
 func ext print(to_print: str);
 
-func main() {
+func oncreate() {
     print("Hello World!");
 }</pre>
                     <p>You will notice something new, which is the import ... as object. when you import a file as an object, psc will search for the .o file and link it automatically.</p>
@@ -549,79 +592,45 @@ Hello World!</pre>
                     <br>
                     <h4 id="uixml">XML Syntax</h4>
                     <p>Pekoscript supports a very simple XML Syntax currently</p>
-                    <p>It starts with the PekoX flag</p>
-                    <pre class="prettyprint">&lt;PekoX&gt;&lt;/PekoX&gt;</pre>
-                    <p>Any valid html tag can be used between the PekoX tag.</p>
+                    <p>Any valid html tag can be used for the syntax.</p>
                     <p>It is possible to insert values by using braces, for example:</p>
                     <pre class="prettyprint">let name = "Dude";
-&lt;PekoX&gt;
-    &lt;h1&gt;Hello, my name is {name}&lt;/h1&gt;
-&lt;/PekoX&gt;</pre>
+&lt;h1&gt;Hello, my name is {name}&lt;/h1&gt;
+}</pre>
+
                     <p>Any valid Pekoscript expression can be put in the braces.</p>
                     <h4 id="uipage">Creating a Page</h4>
-                    <p>To create a page in Pekoscript, you can create a class that inherits from pekoui::PekoPage:</p>
-                    <pre class="prettyprint">class MainPage : ui::PekoPage {
+                    <p>To create a page in Pekoscript, you can create a class that inherits from pekoui::Page:</p>
+                    <pre class="prettyprint">class MainPage : ui::Page {
     // define attributes
 
     // define methods
 }</pre>
-                    <p>PekoPage has a few methods that can be used:</p>
-                    <ul>
-                        <li><pre class="prettyprint">func render(ui::PekoApp): str</pre> ↳ returns the final rendered html</li>
-                        <li><pre class="prettyprint">func style(ui::PekoApp): str</pre> ↳ returns the final css styling</li>
-                    </ul>
-                    <h4 id="uicallback">Adding Callbacks</h4>
-                    <p>Callbacks are created in the xml syntax, but can only be created in a PekoPage object.</p>
-                    <p>To add callbacks, first create the method in the class.</p>
-                    <p>Callbacks take a list of arguments from the javascript, and can return a string with a JSON object.</p>
-                    <p>After, add it in the xml as an attribute:</p>
-                    <pre class="prettyprint">class MainPage : PekoPage {
-    ...
-    func callback(args: std::Array&lt;std::String&gt;, peko_app: cvoid): str {
-        let app: ui::PekoApp = ui::get_app(peko_app);
-        ...
-    }
-
-    func render(app: ui::PekoApp) {
-        return &lt;PekoX&gt;
-            &lt;button onclick="{callback}"&gt;Click Me&lt;/button&gt;
-        &lt;/PekoX&gt;
-    }
-}</pre>
-                <div class="note">
-                    <i class="fa-solid fa-lightbulb"></i>
-                    <span>The render method should always have an argument with the exact name "app" that has the type of a ui::PekoApp. Also, callbacks take an argument of cvoid that contains the reference to the page.</span>
-                </div>
+                <p>In order to render your app, Pekoscript uses a minimal webserver to render pages.</p>
+                <pre class="prettyprint">func request(req_data: ui::RequestData, type: str): str</pre>
+                <p>
+                    the request method can be used to handle requests to a page.
+                </p>
+                <p>
+                    the type string will either containe "POST" or "GET", depending on the requested type.
+                    Currently, pekoscript doesn't support forms using POST as method, but GET can be used as the method.
+                    More advanced functionality will be gone over through a seperate documentation for the pekoui library.
+                </p>
                 <h4 id="uiapp">Creating the App</h4>
                 <p>The pekoui library has a class named PekoApp. It is what will be used to instantiate and hold pages.</p>
                 <p>Lets create an example pekoscript app for this:</p>
                 <p>Start off by creating your page. We'll create a counter app:</p>
-                <pre class="prettyprint">class MainPage : PekoPage {
-    counter: num,
-    
-    func __init__() {
-        this.counter = 0;
-    }
-
-    func increment(args: std::Array&lt;std::String&gt;, peko_app: cvoid): str {
-        let app = get_app(peko_app);
-        this.counter += 1
-        app.reload(); // update the ui to show the new counter
+                <pre class="prettyprint">class MainPage : ui::Page {
+    func request(req_data: ui::RequestData, type: str): str {
         return "";
     }
-
-    func render(app: ui::PekoApp) {
-        return &lt;PekoX&gt;
-            &lt;h1&gt;Counter is {this.counter}&lt;/h1&gt;
-            &lt;button onclick="{increment}"&gt;Add to counter&lt;/button&gt;
-        &lt;/PekoX&gt;
-    }
-}</pre>
+}
+</pre>
             <p>Next, we'll create the app in the main function:</p>
-            <pre class="prettyprint">func main() {
-    let app = ui::PekoApp("First Peko GUI", 800, 800) // the two numbers are the width and height of the window
-    app.add_page("index", MainPage()) // insert the page as the index, the first page to be rendered
-    app.start() // start the app
+            <pre class="prettyprint">func oncreate() {
+    let app = ui::App("First Peko GUI", 800, 800) // the two numbers are the width and height of the window
+    app.route("/", MainPage()) // insert the page as /, the first page to be rendered
+    app.run() // start the app
 }</pre>
             <p>Compile this psc, run it, and you will have your first Web based UI running</p>
             <div class="line"></div>
@@ -629,9 +638,6 @@ Hello World!</pre>
             <p>Congratulations, you have finished the docs, now it's time to get started. Start by creating a simple app and see how the components work.</p>
             <p>Look out for more updates such as:</p>
             <ul>
-                <li>Enhanced XML Syntax</li>
-                <li>Variable Arguments for functions</li>
-                <li>More libraries</li>
                 <li>Package Manager</li>
                 <li>Mobile support</li>
                 <li>And much more...</li>
